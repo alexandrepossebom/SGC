@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title>Venda - {{ cliente.nome }}</title>
+<link rel="stylesheet" type="text/css" href="/admin_media/css/base.css" />
+<link rel="stylesheet" type="text/css" href="/admin_media/css/forms.css" />
+<link rel="stylesheet" type="text/css" href="/admin_media/css/widgets.css" />
+<script type="text/javascript" src="/admin/jsi18n/"></script>
+<script src="/admin_media/js/core.js"></script>
+
+<script src="/admin_media/js/dateparse.js"></script>
+<script src="/admin_media/js/timeparse.js"></script>
+<script src="/admin_media/js/calendar.js"></script>
+<script src="/admin_media/js/admin/DateTimeShortcuts.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+function Limpar(valor, validos) {
+	var result = "";
+	var aux;
+	for (var i=0; i < valor.length; i++) {
+		aux = validos.indexOf(valor.substring(i, i+1));
+		if (aux>=0) {
+			result += aux;
+		}
+	}
+	return result;
+}
+
+function Formata(campo,tammax,teclapres,decimal) {
+	var tecla = teclapres.keyCode;
+	vr = Limpar(campo.value,"0123456789");
+	tam = vr.length;
+	dec=decimal
+
+	if (tam < tammax && tecla != 8){ tam = vr.length + 1 ; }
+
+	if (tecla == 8 ){ tam = tam - 1 ; }
+
+	if ( tecla == 8 || tecla >= 48 && tecla <= 57 || tecla >= 96 && tecla <= 105 ){
+
+		if ( tam <= dec ){ campo.value = vr ; }
+
+		if ( (tam > dec) && (tam <= 5) ){
+			campo.value = vr.substr( 0, tam - 2 ) + "," + vr.substr( tam - dec, tam ) ; }
+		if ( (tam >= 6) && (tam <= 8) ){
+			campo.value = vr.substr( 0, tam - 5 ) + "." + vr.substr( tam - 5, 3 ) + "," + vr.substr( tam - dec, tam ) ; 
+		}
+		if ( (tam >= 9) && (tam <= 11) ){
+			campo.value = vr.substr( 0, tam - 8 ) + "." + vr.substr( tam - 8, 3 ) + "." + vr.substr( tam - 5, 3 ) + "," + vr.substr( tam - dec, tam ) ; }
+		if ( (tam >= 12) && (tam <= 14) ){
+			campo.value = vr.substr( 0, tam - 11 ) + "." + vr.substr( tam - 11, 3 ) + "." + vr.substr( tam - 8, 3 ) + "." + vr.substr( tam - 5, 3 ) + "," + vr.substr( tam - dec, tam ) ; }
+		if ( (tam >= 15) && (tam <= 17) ){
+			campo.value = vr.substr( 0, tam - 14 ) + "." + vr.substr( tam - 14, 3 ) + "." + vr.substr( tam - 11, 3 ) + "." + vr.substr( tam - 8, 3 ) + "." + vr.substr( tam - 5, 3 ) + "," + vr.substr( tam - 2, tam ) ;}
+		} 
+
+}
+
+
+function formatCurrency(num) {
+	num = num.toString().replace(/\$|\,/g,'');
+	if(isNaN(num)) num = "0";
+	cents = Math.floor((num*100+0.5)%100);
+	num = Math.floor((num*100+0.5)/100).toString();
+	if(cents < 10) cents = "0" + cents;
+	for (var i = 0; i < Math.floor((num.length-(1+i))/3); i++)
+	num = num.substring(0,num.length-(4*i+3))+'.'+num.substring(num.length-(4*i+3));
+	return ('R$ ' + num + ',' + cents);
+} 
+
+
+function updateFormas(){
+	var total=document.getElementById("id_total").value;
+	total = total.replace(".", "");
+	total = total.replace(",", ".");
+	{% for forma in formas %}
+	var ajuste{{forma.id}} = {{forma.ajuste}};
+	var parcelas{{forma.id}} = {{forma.num_parcelas}};
+	var valor{{forma.id}} = total * ajuste{{forma.id}} / parcelas{{forma.id}};
+	valor{{forma.id}} = formatCurrency(valor{{forma.id}});
+	document.getElementById('forma_{{forma.id}}').innerHTML = valor{{forma.id}};
+	{% endfor %}
+}
+</script>
+
+
+    </head>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+    <body>
+		{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        <form action="/compra/end/{{ cliente.id }}/" method="post">
+            <table border=1>
+					<tr>
+						<th>
+						<label for="id_cliente">Cliente:</label>
+						</th>
+						<td>{{ cliente.nome }}</td>
+					</tr>
+
+                <tr>
+						<th>
+						<label for="id_data">Data da Compra:</label>
+						</th>
+						<td>
+						<input id="id_data" type="text" class="vDateField" name="data" size="10" />
+						</td>
+					</tr>
+
+					<tr>
+						<th>
+							<label for="id_total">Total:</label>
+						</th>
+						<td>
+						<input type="text" name="total" id="id_total" size="10" onChange="updateFormas()" onKeydown="Formata(this,20,event,2)" />
+						</td>
+					</tr>
+					<tr>
+						<th>
+							<label for="id_itens">Itens:</label>
+						</th>
+						<td>
+						<input type="text" name="itens" id="id_itens" size="2"/>
+						</td>
+					</tr>
+						<tr>
+						<th>
+						<label for="id_vendedor">Vendedor(a):</label>
+						</th>
+						<td>
+						<select name="vendedor" id="id_vendedor">
+							<option value="">---------</option>
+							{% for vendedor in vendedores %}
+							<option value="{{vendedor.id}}">{{vendedor.nome}}</option>
+							{% endfor %}
+						</select>
+						</td>
+					</tr>
+
+					<tr>
+						<th colspan="2">
+							<label for="id_itens"><b>Formas de Pagamento:</b></label>
+						</th>
+					</tr>
+
+					{% for forma in formas %}
+					<tr>
+							<th>
+							<input type="radio" name=forma id="type" value="{{forma.id}}">&nbsp;{{forma.nome}} 
+							</th>
+							<td>
+							<div id="forma_{{forma.id}}">R$ 0,00</div>	
+							</td>
+					</tr>
+					{% endfor %}
+					<tr>
+						<td colspan=2 align=center>
+            		<input type="submit" value="Adicionar"/>
+						</td>
+					</tr>
+            </table>
+        </form>
+
+    </body>
+</html>

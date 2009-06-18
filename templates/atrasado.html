@@ -1,0 +1,13 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>Clientes em atraso</title>
+	</head>
+	<body>
+		{% for parcela in parcelas %}
+		  {{ parcela.compra.cliente.nome }} - {{parcela.valor}} - {{ parcela.vencimento }}<br />
+  		{% endfor %}
+		<br> {{total}}
+	</body>
+</html>
