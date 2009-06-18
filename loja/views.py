@@ -72,11 +72,15 @@ def atrasado(request, dias):
 	hoje = hoje + relativedelta(days=+int(dias))
 	parcelas = Parcela.objects.filter(vencimento__lte=hoje)
 	p = Parcela.objects.filter(vencimento__lte=hoje)
+	total = 0
 	for parcela in parcelas:
+		total = total + parcela.valor 
 		valor = 0
 		for pagamento in parcela.pagamento_set.all():
 			valor = valor + pagamento.valor
 			if valor > parcela.valor:
-				parcelas = parcelas.exclude(pk=parcela.id)	
-	return render_to_response('atrasado.html', {'parcelas': parcelas})
+				parcelas = parcelas.exclude(pk=parcela.id)
+			else:
+				total = total - valor
+	return render_to_response('atrasado.html', {'parcelas': parcelas, 'total': total})
 
