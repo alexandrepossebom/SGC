@@ -7,6 +7,9 @@ from sgc.loja.models import Telefone
 from sgc.loja.models import FormaPagamento
 from sgc.loja.models import Empresa
 from sgc.loja.models import Conjuge
+from sgc.loja.models import Vendedor
+from sgc.loja.models import Cidade
+from sgc.loja.models import Pagamento
 
 
 class TelefoneAdmin(admin.TabularInline):
@@ -20,7 +23,7 @@ class ConjugeAdmin(admin.TabularInline):
 class ClienteAdmin(admin.ModelAdmin):
 	cpf = forms_br.BRCPFField(label=u'CPF',required=False)
 	inlines = [ TelefoneAdmin, ConjugeAdmin]
-	list_display = ("nome","cpf","data_cadastro")
+	list_display = ("nome","estado_civil","sexo","data_cadastro")
 	ordering = ["-nome"]
 	search_fields = ("nome","cpf")
 	list_filter = ("nome",)
@@ -40,3 +43,6 @@ admin.site.register(Cliente, ClienteAdmin)
 admin.site.register(FormaPagamento)
 admin.site.register(TipoTelefone)
 admin.site.register(Empresa)
+admin.site.register(Vendedor)
+admin.site.register(Cidade)
+admin.site.register(Pagamento)

@@ -5,16 +5,11 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Example:
-    # (r'^sgc/', include('sgc.foo.urls')),
-
-    # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
-    # to INSTALLED_APPS to enable admin documentation:
-    # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
     (r'^$', 'sgc.loja.views.index'),
     (r'^adicionar_cliente/$', 'sgc.loja.views.adicionar_cliente'),
     (r'^mostra_dados_cliente/(?P<codigo>\d+)/$', 'sgc.loja.views.mostra_dados_cliente'),
+    (r'^compra/add/(?P<codigo>\d+)/$', 'sgc.loja.views.compra_add'),
+    (r'^compra/end/(?P<codigo>\d+)/$', 'sgc.loja.views.compra_end'),
+    (r'^atrasado/(?P<dias>\d+)/$', 'sgc.loja.views.atrasado'),
     (r'^admin/(.*)', admin.site.root),
 )

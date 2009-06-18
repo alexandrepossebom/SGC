@@ -5,9 +5,13 @@
 		<title>Tutorial RFDev.org</title>
 	</head>
 	<body>
-		<a href="/adicionar_cliente/">Adicionar Cliente</a><br /><br />
+		<a href="/atrasado/2/">Listar Atrasados</a><br/>
+		<table>
 		{% for clientes in clientes %}
-			<a href="/mostra_dados_cliente/{{ clientes.id }}/">{{ clientes.nome }}</a><br />
+			<tr>
+				<td> {{ clientes.nome }}</td><td><a href="/compra/add/{{ clientes.id }}/">comprar</a></td>
+			</tr>
   		{% endfor %}
+		</table>
 	</body>
 </html>

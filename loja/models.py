@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.localflavor.br.br_states import STATE_CHOICES
 from datetime import datetime
 from django.forms import ModelForm
+import locale
 
 # Create your models here.
 
@@ -16,10 +17,50 @@ ESTADO_CIVIL_CHOICES = [ ['Solteiro(a)','Solteiro(a)' ],
                     ['Viúvo(a)','Viúvo(a)' ],
                     ['Separado(a), ou Divorciado(a)','Separado(a), ou Divorciado(a)' ]]
 
+def moeda_brasileira(numero):
+	try:
+		contador = 0
+		preco_str = ''
+		num = numero.__str__()
+		if '.' in num:
+			preco, centavos = num.split('.')
+		else:
+			preco = num
+			centavos = '00'
+		tamanho = len(preco)
+		while tamanho > 0:
+			preco_str = preco_str + preco[tamanho-1]
+			contador += 1
+			if contador == 3 and tamanho > 1:
+				preco_str = preco_str + '.'
+				contador = 0
+			tamanho -= 1
+ 		tamanho = len(preco_str)
+		str_preco = ''
+		while tamanho > 0:
+			str_preco = str_preco + preco_str[tamanho-1]
+			tamanho -= 1
+			return "R$ %s,%s" % (str_preco, centavos)
+	except:
+		return 'Erro. Nao foi possivel formatar.'
+
+
 class Empresa(models.Model):
 	nome = models.CharField(max_length=70)
 	def __unicode__(self):
 		return "%s" % (unicode(self.nome))
+
+
+class Cidade(models.Model):
+	nome = models.CharField(max_length=100)
+	def __unicode__(self):
+		return "%s" % (unicode(self.nome))
+
+def get_sjp():
+	if Cidade.objects.get(id=1) is not None:
+		return Cidade.objects.get(id=1)
+	else:
+		return None
 
 class Cliente(models.Model):
 	nome = models.CharField(max_length=100)
@@ -27,8 +68,8 @@ class Cliente(models.Model):
 	rg  = models.CharField(max_length=30,null=True, blank=True)
 	nat_estado = models.CharField('Estado',choices=STATE_CHOICES, max_length=2, null=True, blank=True, default="PR")
 	end_estado = models.CharField('Estado',choices=STATE_CHOICES, max_length=2, null=True, blank=True, default="PR")
-	nat_cidade = models.CharField('Cidade',max_length=30, null=True, blank=True, default='São José dos Pinhais')
-	end_cidade = models.CharField('Cidade',max_length=50, null=True, blank=True, default='São José dos Pinhais')
+	end_cidade = models.ForeignKey(Cidade,verbose_name="Cidade",null=True, blank=True,related_name='end_cidade')#, default=get_sjp)
+	nat_cidade = models.ForeignKey(Cidade,verbose_name="Cidade",null=True, blank=True,related_name='nat_cidade')#, default=get_sjp)
 	end_rua = models.CharField('Rua',max_length=50, null=True, blank=True)
 	end_numero = models.PositiveSmallIntegerField('Número',max_length=5, null=True, blank=True)
 	end_cep = models.IntegerField('Cep',null=True, blank=True)
@@ -41,8 +82,8 @@ class Cliente(models.Model):
 	end_bairro = models.CharField('Bairro',max_length=50, null=True, blank=True)
 	tempoderesidencia = models.DateField(u'Data',null=True, blank=True)
 	emp_firma = models.ForeignKey(Empresa,verbose_name="Empresa",null=True, blank=True)
-	emp_cargo =models.CharField('Cargo',max_length=50, null=True, blank=True)
-	emp_renda = models.FloatField('Renda Mensal',max_length=50, null=True, blank=True)
+	emp_cargo = models.CharField('Cargo',max_length=50, null=True, blank=True)
+	emp_renda = models.FloatField('Renda Mensal', null=True, blank=True)
 	emp_tempo = models.DateField('Data Admissão',max_length=50, null=True, blank=True)
 
 	class Meta:
@@ -58,7 +99,7 @@ class Conjuge(models.Model):
 	emp_firma = models.ForeignKey(Empresa,verbose_name="Empresa",null=True, blank=True)
 	emp_cargo = models.CharField('Cargo',max_length=50, null=True, blank=True)
 	emp_tempo = models.DateField('Data Admissão',max_length=50, null=True, blank=True)
-	emp_renda = models.DecimalField('Renda Mensal', max_digits=5, decimal_places=2, null=True, blank=True)
+	emp_renda = models.FloatField('Renda Mensal',null=True, blank=True)
 	cliente = models.OneToOneField(Cliente)
 	class Meta:
  		verbose_name_plural = u'Conjuge'
@@ -89,19 +130,12 @@ class FormaPagamento(models.Model):
 		return "%s" % (self.nome)
 
 
-class Parcela(models.Model):
-	valor = models.FloatField()
-	vencimento = models.DateField()
-	paga = models.BooleanField(default=False)
-	data_pagamento = models.DateTimeField(null=True, blank=True)
-	def __unicode__(self):
-		return "%s" % (self.valor)
-
 class Vendedor(models.Model):
-	nome = models.CharField(max_length=3)
+	nome = models.CharField(max_length=30)
 	def __unicode__(self):
 		return "%s" % (self.nome)
-
+	class Meta:
+		verbose_name_plural = u'Vendedores'
 
 class Compra(models.Model):
 	data = models.DateTimeField(default=datetime.now)
@@ -110,6 +144,34 @@ class Compra(models.Model):
 	forma = models.ForeignKey(FormaPagamento)
 	vendedor = models.ForeignKey(Vendedor)
 	item = models.PositiveSmallIntegerField(null=True, blank=True)
+	cliente = models.ForeignKey(Cliente)
+	def __unicode__(self):
+		return "%s,%s" % (self.data,self.total)
+
+class Parcela(models.Model):
+	valor = models.FloatField()
+	vencimento = models.DateField()
+	compra = models.ForeignKey(Compra)
+	ispaga = models.BooleanField(default=False) 
+	def __unicode__(self):
+		return "%s" % (self.valor)
+	def getPrecoFormatado(self):
+		return moeda_brasileira("%.2f" % self.valor)
+
+class Pagamento(models.Model):
+	valor = models.FloatField()
+	data_pagamento = models.DateTimeField(null=True, blank=True)
+	parcela = models.ForeignKey(Parcela)
+	def __unicode__(self):
+		return "%s" % (self.valor)
+
+class PreVenda(models.Model):
+	data = models.DateTimeField(default=datetime.now)
+	previsao = models.DateTimeField(default=datetime.now)
+	total = models.FloatField()
+	vendedor = models.ForeignKey(Vendedor)
+	item = models.PositiveSmallIntegerField(null=True, blank=True)
+	cliente = models.ForeignKey(Cliente)
 	def __unicode__(self):
 		return "%s,%s" % (self.data,self.total)
 
