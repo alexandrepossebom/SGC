@@ -1,17 +1,24 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-		<title>Tutorial RFDev.org</title>
-	</head>
-	<body>
-		<a href="/atrasado/2/">Listar Atrasados</a><br/>
-		<table>
-		{% for clientes in clientes %}
-			<tr>
-				<td> {{ clientes.nome }}</td><td><a href="/compra/add/{{ clientes.id }}/">comprar</a></td>
-			</tr>
-  		{% endfor %}
-		</table>
-	</body>
-</html>
+{% extends "base.html" %}
+
+{% block titulo %}Index{% endblock %}
+{% block conteudo %}
+<div id="container">
+
+<div id="content" class="colMS">
+<h1>Administração de Loja</h1>
+<div id="content-main">
+<a href="/atrasado/2/">Listar Atrasados</a><br/>
+<div class="module">
+<table>
+<caption><a href="" class="section">Loja</a></caption>
+{% for clientes in clientes %}
+<tr>
+<th scope="row"> {{ clientes.nome }}</th>
+<td><a href="/compra/add/{{ clientes.id }}/" class="addlink">comprar</a></td>
+</tr>
+</div>
+</div>
+</div>
+</div>
+{% endfor %}
+{% endblock %}
