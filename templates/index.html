@@ -1,24 +1,12 @@
 {% extends "base.html" %}
-
+ 
 {% block titulo %}Index{% endblock %}
 {% block conteudo %}
-<div id="container">
-
-<div id="content" class="colMS">
 <h1>Administração de Loja</h1>
-<div id="content-main">
 <a href="/atrasado/2/">Listar Atrasados</a><br/>
-<div class="module">
-<table>
 <caption><a href="" class="section">Loja</a></caption>
 {% for cliente in clientes %}
-<tr>
-<th scope="row"><a href="/detalhes/{{cliente.id}}/">{{ cliente.cliente_nome }}</a></th>
-<td><a href="/compra/add/{{ cliente.id }}/" class="addlink">comprar</a></td>
-</tr>
-</div>
-</div>
-</div>
-</div>
+<a href="/detalhes/{{cliente.id}}/">{{ cliente.cliente_nome }}</a>
+<a href="/compra/add/{{ cliente.id }}/" class="addlink">comprar</a>
 {% endfor %}
 {% endblock %}

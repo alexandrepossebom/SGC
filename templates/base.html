@@ -1,25 +1,49 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-	<title>{% block titulo %}Meu site{% endblock %}</title>
+<title>{% block titulo %}Meu site{% endblock %}</title>
+<meta http-equiv="Content-Language" content="Portuguese" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="/media/style.css" media="screen" />
 	<link rel="stylesheet" type="text/css" href="/admin_media/css/base.css" />
 	<link rel="stylesheet" type="text/css" href="/admin_media/css/forms.css" />
 	<link rel="stylesheet" type="text/css" href="/admin_media/css/widgets.css" />
 	<link rel="stylesheet" type="text/css" href="/admin_media/css/dashboard.css" />
+
 </head>
+<body>
+<div id="wrap">
 
-<body class="dashboard">
-<div id="sidebar">
-{% block sidebar %}
-<ul>
-<li><a href="/">Home</a></li>
-<li><a href="/blog/">Blog</a></li>
-</ul>
-{% endblock %}
+<div id="top"></div>
+
+<div id="content">
+
+<div class="header">
+<h1><a href="#">SGC</a></h1>
+<h2>Sistema Gerenciador de Crédito</h2>
 </div>
 
-<div id="conteudo">
+<div class="breadcrumbs">
+<a href="/">Home</a> &middot; You are here
+</div>
+<div class="middle">
+
 {% block conteudo %}{% endblock %}
+
+
 </div>
+
+<div id="clear"></div>
+</div>
+
+<div id="bottom"></div>
+
+</div>
+
+<div id="footer">
+Design by <a href="http://www.minimalistic-design.net">Minimalistic Design</a>
+</div>
+
 </body>
 </html>
+

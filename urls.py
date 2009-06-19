@@ -1,4 +1,6 @@
 from django.conf.urls.defaults import *
+from django.conf import settings
+
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -6,6 +8,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^$', 'sgc.loja.views.index'),
+	 (r'^media/(.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     (r'^adicionar_cliente/$', 'sgc.loja.views.adicionar_cliente'),
     (r'^mostra_dados_cliente/(?P<codigo>\d+)/$', 'sgc.loja.views.mostra_dados_cliente'),
     (r'^compra/add/(?P<codigo>\d+)/$', 'sgc.loja.views.compra_add'),

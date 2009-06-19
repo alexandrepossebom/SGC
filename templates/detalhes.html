@@ -1,14 +1,41 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-		<title>Tutorial RFDev.org</title>
-	</head>
-	<body>
-		{{cliente.cliente_nome}}
-		{% if cliente.compra_set.all %}
-		{% for compra in cliente.compra_set.all %}
-			<br>{{compra.total}}-{{compra.item}}-{{compra.data}}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Blue Freedom by minimalistic-design.net</title>
+<meta http-equiv="Content-Language" content="Portuguese" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="/media/style.css" media="screen" />
+</head>
+<body>
+<div id="wrap">
+
+<div id="top"></div>
+
+<div id="content">
+
+<div class="header">
+<h1><a href="#">SGC</a></h1>
+<h2>Sistema Gerenciador de Crédito</h2>
+</div>
+
+<div class="breadcrumbs">
+<a href="/">Home</a> &middot; You are here
+</div>
+
+<div class="middle">
+
+<table border=1 width=100%>
+<tr>
+<td>
+ola
+</td>
+</tr>
+</table>
+		
+<h2>{{cliente.cliente_nome}}</h2>
+{% if cliente.compra_set.all %}
+	{% for compra in cliente.compra_set.all %}
+		<br>{{compra.total}}-{{compra.item}}-{{compra.data}}
 			{% for parcela in compra.parcela_set.all %}
 				{% if parcela.isPaga %}
 					<br> {{parcela.getVencimentoFormatado}} - {{parcela.getPrecoFormatado}} - {{parcela.diasAtraso}} - {{parcela.isAtrasado}} - 1
@@ -24,5 +51,19 @@
 		{% else %}
 			<p>Cliente ainda não fez nenhuma compra</p>
 		{% endif %}
-	</body>
+
+</div>
+		
+<div id="clear"></div>
+</div>
+
+<div id="bottom"></div>
+
+</div>
+
+<div id="footer">
+Design by <a href="http://www.minimalistic-design.net">Minimalistic Design</a>
+</div>
+
+</body>
 </html>
