@@ -2,8 +2,10 @@
 from django.db import models
 from django.contrib.localflavor.br.br_states import STATE_CHOICES
 from datetime import datetime
+from datetime import date
 from django.forms import ModelForm
 import locale
+from decimal import Decimal
 
 # Create your models here.
 
@@ -40,30 +42,24 @@ def moeda_brasileira(numero):
 		while tamanho > 0:
 			str_preco = str_preco + preco_str[tamanho-1]
 			tamanho -= 1
-			return "R$ %s,%s" % (str_preco, centavos)
+		return "R$ %s,%s" % (str_preco, centavos)
 	except:
 		return 'Erro. Nao foi possivel formatar.'
 
 
 class Empresa(models.Model):
-	nome = models.CharField(max_length=70)
+	empresa_nome = models.CharField('Nome',max_length=70)
 	def __unicode__(self):
-		return "%s" % (unicode(self.nome))
+		return "%s" % (unicode(self.empresa_nome))
 
 
 class Cidade(models.Model):
-	nome = models.CharField(max_length=100)
+	cidade_nome = models.CharField(max_length=100)
 	def __unicode__(self):
-		return "%s" % (unicode(self.nome))
-
-def get_sjp():
-	if Cidade.objects.get(id=1) is not None:
-		return Cidade.objects.get(id=1)
-	else:
-		return None
+		return "%s" % (unicode(self.cidade_nome))
 
 class Cliente(models.Model):
-	nome = models.CharField(max_length=100)
+	cliente_nome = models.CharField('nome',max_length=100)
 	cpf = models.IntegerField(null=True, blank=True)
 	rg  = models.CharField(max_length=30,null=True, blank=True)
 	nat_estado = models.CharField('Estado',choices=STATE_CHOICES, max_length=2, null=True, blank=True, default="PR")
@@ -83,34 +79,34 @@ class Cliente(models.Model):
 	tempoderesidencia = models.DateField(u'Data',null=True, blank=True)
 	emp_firma = models.ForeignKey(Empresa,verbose_name="Empresa",null=True, blank=True)
 	emp_cargo = models.CharField('Cargo',max_length=50, null=True, blank=True)
-	emp_renda = models.FloatField('Renda Mensal', null=True, blank=True)
+	emp_renda = models.DecimalField('Renda Mensal', max_digits=12,decimal_places=2,null=True, blank=True)
 	emp_tempo = models.DateField('Data Admissão',max_length=50, null=True, blank=True)
 
 	class Meta:
 		verbose_name_plural = u'Clientes'
 		db_table = 'cliente'
-		ordering = ['nome']
+		ordering = ['cliente_nome']
 
 	def __unicode__(self):
-		return "%s" % (unicode(self.nome))
+		return "%s" % (unicode(self.cliente_nome))
 
 class Conjuge(models.Model):	
 	conj_nome = models.CharField('Nome',max_length=50, null=True, blank=True)
 	emp_firma = models.ForeignKey(Empresa,verbose_name="Empresa",null=True, blank=True)
 	emp_cargo = models.CharField('Cargo',max_length=50, null=True, blank=True)
 	emp_tempo = models.DateField('Data Admissão',max_length=50, null=True, blank=True)
-	emp_renda = models.FloatField('Renda Mensal',null=True, blank=True)
+	emp_renda = models.DecimalField('Renda Mensal',null=True, blank=True,max_digits=12,decimal_places=2)
 	cliente = models.OneToOneField(Cliente)
 	class Meta:
  		verbose_name_plural = u'Conjuge'
 
 	def __unicode__(self):
-		return "%s" % (self.nome)
+		return "%s" % (self.conj_nome)
 
 class TipoTelefone(models.Model):
-	nome = models.CharField(max_length=15)
+	tipotelefone_nome = models.CharField('nome',max_length=15)
 	def __unicode__(self):
-		return "%s" % (self.nome)
+		return "%s" % (self.tipotelefone_nome)
 
 class Telefone(models.Model):
 	numero = models.IntegerField()
@@ -122,25 +118,24 @@ class Telefone(models.Model):
 		return "%s (%s)" % (self.numero, self.tipo)
 
 class FormaPagamento(models.Model):
-	nome = models.CharField(max_length=15)
+	formapagamento_nome = models.CharField('nome',max_length=15)
 	entrada = models.BooleanField(default=False)
 	ajuste = models.FloatField()
 	num_parcelas = models.PositiveSmallIntegerField('Parcelas',default=1)
 	def __unicode__(self):
-		return "%s" % (self.nome)
+		return "%s" % (self.formapagamento_nome)
 
 
 class Vendedor(models.Model):
-	nome = models.CharField(max_length=30)
+	vendedor_nome = models.CharField('nome',max_length=30)
 	def __unicode__(self):
-		return "%s" % (self.nome)
+		return "%s" % (self.vendedor_nome)
 	class Meta:
 		verbose_name_plural = u'Vendedores'
 
 class Compra(models.Model):
-	data = models.DateTimeField(default=datetime.now)
-	total = models.FloatField()
-	saldo = models.FloatField()
+	data = models.DateField(default=datetime.now)
+	total = models.DecimalField(max_digits=12,decimal_places=2)
 	forma = models.ForeignKey(FormaPagamento)
 	vendedor = models.ForeignKey(Vendedor)
 	item = models.PositiveSmallIntegerField(null=True, blank=True)
@@ -149,26 +144,53 @@ class Compra(models.Model):
 		return "%s,%s" % (self.data,self.total)
 
 class Parcela(models.Model):
-	valor = models.FloatField()
+	valor = models.DecimalField(max_digits=12,decimal_places=2) 
 	vencimento = models.DateField()
 	compra = models.ForeignKey(Compra)
-	ispaga = models.BooleanField(default=False) 
+	def isPaga(self):
+		total = 0
+		for p in self.pagamento_set.all():
+			total = total + p.valor
+		if total > self.valor:
+			return True
+		return False
+	def isAtrasado(self):
+		dias = (self.vencimento-date.today())
+		if dias > 0 or self.isPaga():
+			return False
+		return True
+	def diasAtraso(self):
+		print self.isPaga()
+		if self.isPaga():
+			return 0
+		dias = (self.vencimento-date.today())
+		return dias.days
 	def __unicode__(self):
 		return "%s" % (self.valor)
 	def getPrecoFormatado(self):
-		return moeda_brasileira("%.2f" % self.valor)
+		string = "%.2f" % float(self.valor)
+		return moeda_brasileira(string)
+	def getValorAberto(self):
+		total = 0
+		for p in self.pagamento_set.all():
+			total = total + p.valor
+		string = "%.2f" % float(self.valor - total)
+		return moeda_brasileira(string)
+	def getVencimentoFormatado(self):
+		return self.vencimento.strftime("%d/%m/%Y")
+
 
 class Pagamento(models.Model):
-	valor = models.FloatField()
-	data_pagamento = models.DateTimeField(null=True, blank=True)
+	valor = models.DecimalField(max_digits=12,decimal_places=2)
+	data_pagamento = models.DateField(null=True, blank=True)
 	parcela = models.ForeignKey(Parcela)
 	def __unicode__(self):
 		return "%s" % (self.valor)
 
 class PreVenda(models.Model):
-	data = models.DateTimeField(default=datetime.now)
-	previsao = models.DateTimeField(default=datetime.now)
-	total = models.FloatField()
+	data = models.DateField(default=datetime.now)
+	previsao = models.DateField(default=datetime.now)
+	total = models.DecimalField(max_digits=12,decimal_places=2)
 	vendedor = models.ForeignKey(Vendedor)
 	item = models.PositiveSmallIntegerField(null=True, blank=True)
 	cliente = models.ForeignKey(Cliente)

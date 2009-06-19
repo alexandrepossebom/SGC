@@ -23,13 +23,13 @@ class ConjugeAdmin(admin.TabularInline):
 class ClienteAdmin(admin.ModelAdmin):
 	cpf = forms_br.BRCPFField(label=u'CPF',required=False)
 	inlines = [ TelefoneAdmin, ConjugeAdmin]
-	list_display = ("nome","estado_civil","sexo","data_cadastro")
-	ordering = ["-nome"]
-	search_fields = ("nome","cpf")
-	list_filter = ("nome",)
+	list_display = ("cliente_nome","estado_civil","sexo","data_cadastro")
+	ordering = ["-cliente_nome"]
+	search_fields = ("cliente_nome","cpf")
+	list_filter = ("cliente_nome",)
 	radio_fields = {'sexo': admin.HORIZONTAL}  
 	fieldsets = [
-        ('Dados Pessoais'  , {'fields': ['nome','cpf','rg','estado_civil','sexo']}),
+        ('Dados Pessoais'  , {'fields': ['cliente_nome','cpf','rg','estado_civil','sexo']}),
         ('Nascimento'      , {'fields': ['nascimento','nat_estado','nat_cidade']}),
         ('Paternidade', {'fields': [('pai','mae')]}),
         ('Endereço',    {'fields': [('end_rua','end_numero'),'end_cep','end_cidade','end_estado','end_bairro','tempoderesidencia']}),

@@ -11,5 +11,8 @@ urlpatterns = patterns('',
     (r'^compra/add/(?P<codigo>\d+)/$', 'sgc.loja.views.compra_add'),
     (r'^compra/end/(?P<codigo>\d+)/$', 'sgc.loja.views.compra_end'),
     (r'^atrasado/(?P<dias>\d+)/$', 'sgc.loja.views.atrasado'),
+    (r'^detalhes/(?P<codigo>\d+)/$', 'sgc.loja.views.detalhes'),
+    (r'^pagar/(?P<codigo>\d+)/$', 'sgc.loja.views.pagar'),
+    (r'^pagar/end/(?P<codigo>\d+)/$', 'sgc.loja.views.pagar_end'),
     (r'^admin/(.*)', admin.site.root),
 )

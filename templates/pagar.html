@@ -96,73 +96,41 @@ function updateFormas(){
 <br>
     <body>
 		{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-        <form action="/compra/end/{{ cliente.id }}/" method="post">
+        <form action="/pagar/end/{{ parcela.id }}/" method="post">
             <table border=1>
 					<tr>
 						<th>
 						<label for="id_cliente">Cliente:</label>
 						</th>
-						<td>{{ cliente.cliente_nome }}</td>
+						<td>{{ parcela.compra.cliente.cliente_nome }}</td>
 					</tr>
 
                 <tr>
 						<th>
-						<label for="id_data">Data da Compra:</label>
+						<label for="id_data">Data do Pagamento</label>
 						</th>
 						<td>
 						<input id="id_data" type="text" class="vDateField" name="data" size="10" />
 						</td>
 					</tr>
+					'<tr>
+						<th>
+							<label for="id_total">Valor da Parcela:</label>
+						</th>
+						<td>{{parcela.getPrecoFormatado}}	</td>
+					</tr>
 
 					<tr>
 						<th>
-							<label for="id_total">Total:</label>
+							<label for="id_total">Valor Pago:</label>
 						</th>
 						<td>
 						<input type="text" name="total" id="id_total" size="10" onChange="updateFormas()" onKeydown="Formata(this,20,event,2)" />
 						</td>
 					</tr>
 					<tr>
-						<th>
-							<label for="id_itens">Itens:</label>
-						</th>
-						<td>
-						<input type="text" name="itens" id="id_itens" size="2"/>
-						</td>
-					</tr>
-						<tr>
-						<th>
-						<label for="id_vendedor">Vendedor(a):</label>
-						</th>
-						<td>
-						<select name="vendedor" id="id_vendedor">
-							<option value="">---------</option>
-							{% for vendedor in vendedores %}
-							<option value="{{vendedor.id}}">{{vendedor.vendedor_nome}}</option>
-							{% endfor %}
-						</select>
-						</td>
-					</tr>
-
-					<tr>
-						<th colspan="2">
-							<label for="id_itens"><b>Formas de Pagamento:</b></label>
-						</th>
-					</tr>
-
-					{% for forma in formas %}
-					<tr>
-							<th>
-							<input type="radio" name=forma id="type" value="{{forma.id}}">&nbsp;{{forma.formapagamento_nome}} 
-							</th>
-							<td>
-							<div id="forma_{{forma.id}}">R$ 0,00</div>	
-							</td>
-					</tr>
-					{% endfor %}
-					<tr>
 						<td colspan=2 align=center>
-            		<input type="submit" value="Adicionar"/>
+            		<input type="submit" value="Pagar"/>
 						</td>
 					</tr>
             </table>

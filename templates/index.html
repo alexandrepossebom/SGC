@@ -11,10 +11,10 @@
 <div class="module">
 <table>
 <caption><a href="" class="section">Loja</a></caption>
-{% for clientes in clientes %}
+{% for cliente in clientes %}
 <tr>
-<th scope="row"> {{ clientes.nome }}</th>
-<td><a href="/compra/add/{{ clientes.id }}/" class="addlink">comprar</a></td>
+<th scope="row"><a href="/detalhes/{{cliente.id}}/">{{ cliente.cliente_nome }}</a></th>
+<td><a href="/compra/add/{{ cliente.id }}/" class="addlink">comprar</a></td>
 </tr>
 </div>
 </div>

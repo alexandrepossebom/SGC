@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ title }} | SGC{% endblock %}
+
+{% block extrastyle %}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/base_site.css" />
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">Sistema de Gerenciamento de Crediario</h1>
+{% endblock %}
+
+{% block userlinks %}
+  <a href="{{ root_path }}logout/">Encerrar sessão</a>
+{% endblock %}
+
+{% block footer %}
+<div id="footer">
+
+</div>
+{% endblock %}
